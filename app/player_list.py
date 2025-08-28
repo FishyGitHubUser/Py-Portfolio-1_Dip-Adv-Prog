@@ -20,9 +20,20 @@ class PlayerList:
             self._head = new_node
             self._tail = new_node
         else:
-            new_node.next_node = self._head
-            self._head.previous_node = new_node
+            new_node.next_node = self._head         # New node links to head
+            self._head.previous_node = new_node     # Head links to new node
+            self._head = new_node                   # New node is now new head
+
+    def new_node_at_tail(self, player: Player):
+        new_node = PlayerNode(player)
+
+        if self.is_empty:
             self._head = new_node
+            self._tail = new_node
+        else:
+            self._tail.next_node = new_node         # Tail links to new node
+            new_node.previous_node = self._tail     # New node links to tail
+            self._tail = new_node                   # New node is now new tail
 
     @property
     def head(self):
