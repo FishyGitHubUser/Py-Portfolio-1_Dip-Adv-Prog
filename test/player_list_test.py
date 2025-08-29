@@ -14,39 +14,31 @@ Test coverage includes:
 To run the tests:
     python -m unittest test.player_list_test
 or use your preferred test runner.
+
+References:
+- 'with' statement: Use cases
+    https://www.geeksforgeeks.org/python/with-statement-in-python/
+    https://builtin.com/software-engineering-perspectives/what-is-with-statement-python
 """
 
 
 import unittest
 
 from app.player import Player
-from app.player_list import PlayerList
+from app.player_list import PlayerList, EmptyPlayerListError
 
 
 class TestPlayerListClass(unittest.TestCase):
-    def test_player_list_is_empty(self):
+    def test_is_empty(self):
         player_list = PlayerList()
         self.assertTrue(player_list.is_empty)
 
-    def test_player_list_not_empty(self):
+    def test_not_empty_when_one_player(self):
         player_list = PlayerList()
         player_list.new_node_at_head(Player("1", "player_1"))
         self.assertFalse(player_list.is_empty)
 
-    def test_player_list_new_head_is_tail_when_one_player(self):
-        player_list = PlayerList()
-        player_list.new_node_at_head(Player("1", "player_1"))
-
-        self.assertEqual(player_list._head, player_list._tail)
-
-    def test_player_list_new_head_not_tail_when_multiple_players(self):
-        player_list = PlayerList()
-        player_list.new_node_at_head(Player("1", "player_1"))
-        player_list.new_node_at_head(Player("2", "player_2"))
-
-        self.assertNotEqual(player_list._head, player_list._tail)
-
-    def test_player_list_add_multiple_node(self):
+    def test_not_empty_when_multiple_players(self):
         player_list = PlayerList()
         player_list.new_node_at_head(Player("1", "player_1"))
         player_list.new_node_at_head(Player("2", "player_2"))
@@ -60,19 +52,90 @@ class TestPlayerListClass(unittest.TestCase):
 
         self.assertEqual(list_count, 2)
 
-    def test_player_list_new_tail_is_head_when_one_player(self):
+    def test_new_head_is_tail_when_one_player(self):
+        player_list = PlayerList()
+        player_list.new_node_at_head(Player("1", "player_1"))
+
+        self.assertEqual(player_list.head, player_list.tail)
+
+    def test_new_head_not_tail_when_multiple_players(self):
+        player_list = PlayerList()
+        player_list.new_node_at_head(Player("1", "player_1"))
+        player_list.new_node_at_head(Player("2", "player_2"))
+
+        self.assertNotEqual(player_list.head, player_list.tail)
+
+    def test_new_tail_is_head_when_one_player(self):
         player_list = PlayerList()
         player = Player("1", "player_1")
         player_list.new_node_at_tail(player)
 
-        self.assertEqual(player_list._tail.player, player)
+        self.assertEqual(player_list.tail.player, player)
 
-    def test_player_list_new_tail_not_head_when_multiple_players(self):
+    def test_new_tail_not_head_when_multiple_players(self):
         player_list = PlayerList()
         player_list.new_node_at_tail(Player("1", "player_1"))
         player_list.new_node_at_tail(Player("2", "player_2"))
 
-        self.assertNotEqual(player_list._head, player_list._tail)
+        self.assertNotEqual(player_list.head, player_list.tail)
+
+    def test_delete_node_at_head_raises_error_when_empty(self):
+        player_list = PlayerList()
+
+        with self.assertRaises(EmptyPlayerListError):
+            player_list.delete_node_at_head()
+
+    def test_delete_node_at_head_when_one_player(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+
+        removed_node = player_list.delete_node_at_head()
+
+        self.assertTrue(player_list.is_empty)
+        self.assertEqual(removed_node.player.uid, "1")
+        self.assertIsNone(player_list.head)
+        self.assertIsNone(player_list.tail)
+
+    def test_delete_node_at_head_when_multiple_players(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+        player_list.new_node_at_tail(Player("2", "player_2"))
+
+        removed_head_node = player_list.delete_node_at_head()
+
+        self.assertFalse(player_list.is_empty)
+        self.assertEqual(removed_head_node.player.uid, "1")
+        self.assertEqual(player_list.head.player.uid, "2" )
+        self.assertIsNone(player_list.head.previous_node)
+
+    def test_delete_node_at_tail_raises_error_when_empty(self):
+        player_list = PlayerList()
+
+        with self.assertRaises(EmptyPlayerListError):
+            player_list.delete_node_at_tail()
+
+    def test_delete_node_at_tail_when_one_player(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+
+        removed_tail_node = player_list.delete_node_at_tail()
+
+        self.assertTrue(player_list.is_empty)
+        self.assertEqual(removed_tail_node.player.uid, "1")
+        self.assertIsNone(player_list.head)
+        self.assertIsNone(player_list.tail)
+
+    def test_delete_node_at_tail_when_multiple_players(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+        player_list.new_node_at_tail(Player("2", "player_2"))
+
+        removed_tail_node = player_list.delete_node_at_tail()
+
+        self.assertFalse(player_list.is_empty)
+        self.assertEqual(removed_tail_node.player.uid, "2")
+        self.assertEqual(player_list.tail.player.uid, "1")
+        self.assertIsNone(player_list.head.previous_node)
 
 if __name__ == '__main__':
     unittest.main()
