@@ -19,6 +19,8 @@ References:
 - 'with' statement: Use cases
     https://www.geeksforgeeks.org/python/with-statement-in-python/
     https://builtin.com/software-engineering-perspectives/what-is-with-statement-python
+- Inserting item list
+    https://stackoverflow.com/questions/8243188/inserting-a-string-into-a-list-without-getting-split-into-characters
 """
 
 
@@ -176,6 +178,15 @@ class TestPlayerListClass(unittest.TestCase):
                 self.assertEqual(current_node.player.uid, current_node.previous_node.next_node.player.uid)
 
             current_node = current_node.next_node
+
+    def test_display_list_of_players(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+        player_list.new_node_at_tail(Player("2", "player_2"))
+        player_list.new_node_at_tail(Player("3", "player_3"))
+
+        self.assertEqual(player_list.display(), ['Player(1, player_1)', 'Player(2, player_2)', 'Player(3, player_3)'])
+        self.assertEqual(player_list.display(False), ['Player(3, player_3)', 'Player(2, player_2)', 'Player(1, player_1)'])
 
 
 if __name__ == '__main__':
