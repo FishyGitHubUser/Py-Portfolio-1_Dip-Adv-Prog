@@ -137,5 +137,46 @@ class TestPlayerListClass(unittest.TestCase):
         self.assertEqual(player_list.tail.player.uid, "1")
         self.assertIsNone(player_list.head.previous_node)
 
+    def test_delete_node_at_key_when_empty(self):
+        player_list = PlayerList()
+
+        with self.assertRaises(EmptyPlayerListError):
+            player_list.delete_node_at_key("1")
+
+    def test_delete_node_at_key_when_one_player(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+
+        removed_key_node = player_list.delete_node_at_key("1")
+
+        self.assertTrue(player_list.is_empty)
+        self.assertEqual(removed_key_node.player.uid, "1")
+        self.assertIsNone(player_list.head)
+        self.assertIsNone(player_list.tail)
+
+    def test_delete_node_at_key_when_multiple_players(self):
+        player_list = PlayerList()
+        player_list.new_node_at_tail(Player("1", "player_1"))
+        player_list.new_node_at_tail(Player("2", "player_2"))
+        player_list.new_node_at_tail(Player("3", "player_3"))
+        player_list.new_node_at_tail(Player("4", "player_4"))
+
+        removed_node = player_list.delete_node_at_key("3")
+
+        self.assertEqual(removed_node.player.uid, "3")
+
+        # Checks node references updated in Playerlist
+        current_node = player_list.head
+        while current_node:
+            if current_node.player.uid == "2" and current_node.next_node is not None:
+                # Check previous node reference for the next node links to current node
+                self.assertEqual(current_node.player.uid, current_node.next_node.previous_node.player.uid)
+            elif current_node.player.uid == "4" and current_node.previous_node is not None:
+                # Check next node reference for the previous node links to current node
+                self.assertEqual(current_node.player.uid, current_node.previous_node.next_node.player.uid)
+
+            current_node = current_node.next_node
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -70,6 +70,33 @@ class PlayerList:
 
         return removed_node
 
+    def delete_node_at_key(self, key):
+        if self.is_empty:
+            raise EmptyPlayerListError("Cannot delete from key: PlayerList is empty.")
+
+        current_node = self._head
+
+        while current_node:
+            if current_node.player.uid == key:
+                removed_node = current_node
+
+                if self._head is self._tail:
+                    self._head = None
+                    self._tail = None
+                elif current_node is self._head:
+                    self._head = current_node.next_node
+                    self._head.previous_node = None
+                elif current_node is self._tail:
+                    self._tail = current_node.previous_node
+                    self._tail.next_node = None
+                else:
+                    # Change the next_node reference for node prior to the current
+                    current_node.previous_node.next_node = current_node.next_node
+                    # Change the previous_node reference for node after the current
+                    current_node.next_node.previous_node = current_node.previous_node
+                return removed_node
+            current_node = current_node.next_node
+        return None
 
     @property
     def head(self):
